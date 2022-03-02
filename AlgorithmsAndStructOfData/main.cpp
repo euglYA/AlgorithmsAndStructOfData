@@ -1,3 +1,6 @@
+//#include <iostream>
+//#include "filelib.h"
+
 #include <iostream>
 #include "filelib.h"
 
@@ -30,8 +33,8 @@ bool checkForEmpty(const char* file1, const char* file2, const char* file3, cons
 void split(const char* fileName, const char* fileOut1, const char* fileOut2) {
     std::ifstream file(fileName);
     std::ofstream F[2];
-    F[0].open(fileOut1);
-    F[1].open(fileOut2);
+    F[0].open(fileOut1, std::ios::trunc);
+    F[1].open(fileOut2, std::ios::trunc);
 
     int x1, x2, n = 0;
     file >> x1;
@@ -61,9 +64,9 @@ void merge(const char* fileIn1, const char* fileIn2, const char* fileOut1, const
     while (!f1.eof() && !f2.eof()){
         x1 = y1;
         x2 = y2;
-        
+
         while (x1 <= y1 && x2 <= y2 && !f1.eof() && !f2.eof()){
-            
+
             if (y1 < y2){
                 s1 << y1 << " ";
                 x1 = y1;
@@ -80,12 +83,14 @@ void merge(const char* fileIn1, const char* fileIn2, const char* fileOut1, const
             s1 << y1 << " ";
             x1 = y1;
             f1 >> y1;
+
         }
 
         while (x2 <= y2 && !f2.eof()){
             s1 << y2 << " ";
             x2 = y2;
             f2 >> y2;
+
         }
 
         //---
@@ -94,7 +99,7 @@ void merge(const char* fileIn1, const char* fileIn2, const char* fileOut1, const
         x2 = y2;
 
         while (x1 <= y1 && x2 <= y2 && !f1.eof() && !f2.eof()){
-            
+
             if (y1 < y2){
                 s2 << y1 << " ";
                 x1 = y1;
@@ -113,7 +118,7 @@ void merge(const char* fileIn1, const char* fileIn2, const char* fileOut1, const
             f1 >> y1;
         }
 
-        while (x2 <= y2 && !f1.eof()){
+        while (x2 <= y2 && !f2.eof()){
             s2 << y2 << " ";
             x2 = y2;
             f2 >> y2;
@@ -140,11 +145,13 @@ void merge(const char* fileIn1, const char* fileIn2, const char* fileOut1, const
 }
 
 void sort(const char* fileName) {
-    split(fileName, "f1.txt", "f2.txt");
+    split(fileName, "s1.txt", "s2.txt");
 
-    while (!checkForEmpty("f1.txt", "f2.txt", "s1.txt", "s2.txt")) {
-        merge("f1.txt", "f2.txt", "s1.txt", "s2.txt");
-        merge("s1.txt", "s2.txt", "f1.txt", "f2.txt");
+    while (!checkForEmpty(fileName, "f1.txt", "s1.txt", "s2.txt")) {
+        std::cout << "1| ";
+        merge("s1.txt", "s2.txt", fileName, "f1.txt");
+        std::cout << "2| ";
+        merge(fileName, "f1.txt", "s1.txt", "s2.txt");
     }
 }
 
@@ -173,15 +180,12 @@ int createAndSortFile(const char* fileName, const int numbersCount, const int ma
     if (!createFileWithRandomNumbers(fileName, numbersCount, maxNumberValue))
         return -1;
 
-    int x = 0;
-    std::cout << "start? ";
-    std::cin >> x;
-
     sort(fileName);
 
-    std::cout << "File " << whatFileIsSorted("f1.txt", "f2.txt", "s1.txt", "s2.txt") << " is sorted" << std::endl;
+    const char* fileNameEnd = whatFileIsSorted("f1.txt", "f2.txt", "s1.txt", "s2.txt");
+    std::cout << "File " << fileNameEnd << " is sorted" << std::endl;
 
-    if (!isFileContainsSortedArray(whatFileIsSorted("f1.txt", "f2.txt", "s1.txt", "s2.txt")))
+    if (!isFileContainsSortedArray(fileNameEnd))
         return -2;
 
     return 1;
@@ -190,21 +194,22 @@ int createAndSortFile(const char* fileName, const int numbersCount, const int ma
 int main() {
     const char* fileName = "file.txt";
     const int numbersCount = 10;
-    const int maxNumberValue = 10;
+    const int maxNumberValue = 100000;
 
-    switch (createAndSortFile(fileName, numbersCount, maxNumberValue)) {
-    case 1:
-        std::cout << "Test passed." << std::endl;
-        break;
+    for (int i = 0; i < 10; i++) {
+        switch (createAndSortFile(fileName, numbersCount, maxNumberValue)) {
+        case 1:
+            std::cout << "Test passed." << std::endl;
+            break;
 
-    case -1:
-        std::cout << "Test failed: can't create file." << std::endl;
-        break;
+        case -1:
+            std::cout << "Test failed: can't create file." << std::endl;
+            break;
 
-    case -2:
-        std::cout << "test failed: file isn't sorted." << std::endl;
-        break;
+        case -2:
+            std::cout << "test failed: file isn't sorted." << std::endl;
+            break;
+        }
     }
-
     return 0;
 }

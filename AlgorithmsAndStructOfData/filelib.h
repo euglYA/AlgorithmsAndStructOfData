@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <random>
 
 bool createFileWithRandomNumbers(const char* fileName, const int numbersCount, const int maxNumberValue) {
 	std::ofstream file(fileName);
@@ -10,10 +11,12 @@ bool createFileWithRandomNumbers(const char* fileName, const int numbersCount, c
 		return false;
 	}
 
-	srand(time(0));
-	int x = 0;
+	std::default_random_engine generator;
+	std::uniform_int_distribution<int> distribution(0, maxNumberValue);
+	generator.seed(time(0));
+
 	for (int i = 0; i < numbersCount; i++)
-		file << rand() % maxNumberValue << " ";
+		file << distribution(generator) << " ";
 
 	file.close();
 	return true;
