@@ -147,11 +147,9 @@ void merge(const char* fileIn1, const char* fileIn2, const char* fileOut1, const
 void sort(const char* fileName) {
     split(fileName, "s1.txt", "s2.txt");
 
-    while (!checkForEmpty(fileName, "f1.txt", "s1.txt", "s2.txt")) {
-        std::cout << "1| ";
-        merge("s1.txt", "s2.txt", fileName, "f1.txt");
-        std::cout << "2| ";
-        merge(fileName, "f1.txt", "s1.txt", "s2.txt");
+    while (!checkForEmpty("f1.txt", "f2.txt", "s1.txt", "s2.txt")) {
+        merge("s1.txt", "s2.txt", "f1.txt", "f2.txt");
+        merge("f1.txt", "f2.txt", "s1.txt", "s2.txt");
     }
 }
 
